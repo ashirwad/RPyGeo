@@ -6,12 +6,16 @@
 #' @param extensions Optional character vector listing ArcGIS extension that
 #'   should be enabled. This adds to any extensions that are eventually
 #'   detected by \code{rpygeo_required_extensions}.
+#' @param parallel Optional string defining the number of CPU cores to use
+#'   for a geoprocessing operation. Value can be passed as a number (e.g., 2)
+#'   indicating the number of cores to use or as a percentage (e.g., "50%"). 
+#'     
 #' @note This internal function is used by \code{rpygeo_geoprocessor} and
 #'   by \code{rpygeo_build_env}.
 #' @author Fabian Polakowski and Alexander Brenning
 #' @keywords internal
 
-input_check = function (overwrite, extensions) {
+input_check = function (overwrite, extensions, parallel) {
 
   # handle overwrite
   if (overwrite) {
@@ -30,6 +34,11 @@ input_check = function (overwrite, extensions) {
       ext <- paste0("arcpy.CheckOutExtension('", x, "')")
       reticulate::py_run_string(ext)
       })
+  }
+  
+  # handle parallel processing
+  if(!is.null(parallel)) {
+    reticulate::py_run_string(paste0("arcpy.env.parallelProcessingFactor = ", parallel))
   }
 
 }
